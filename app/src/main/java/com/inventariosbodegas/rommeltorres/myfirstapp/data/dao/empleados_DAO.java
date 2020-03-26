@@ -40,4 +40,13 @@ public interface empleados_DAO {
     @Query("SELECT * FROM EMPLEADOS")
     LiveData<List<EMPLEADOS>> getAll();
 
+    @Query("SELECT * FROM EMPLEADOS WHERE EMP_STATUSSERVER=1 LIMIT 1")
+    EMPLEADOS getUnSend();
+
+    @Query("UPDATE EMPLEADOS SET EMP_STATUSSERVER=1 WHERE EMP_ID=:EMP_ID")
+    public void changeStatus(int EMP_ID);
+
+    @Query("UPDATE EMPLEADOS SET EMP_STATUSSERVER=0 WHERE EMP_ID=:EMP_ID")
+    public void updateStatus(int EMP_ID);
+
 }

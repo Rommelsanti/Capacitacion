@@ -17,7 +17,7 @@ public class WebApiAdapter {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(loggingInterceptor);
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-NN-dd'T'HH:mm:ss").create();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 
         String url = "http://192.168.100.223/WebApiCapacitacion/API/";
         Retrofit retrofit = new Retrofit.Builder().baseUrl(url).client(httpClient.build())

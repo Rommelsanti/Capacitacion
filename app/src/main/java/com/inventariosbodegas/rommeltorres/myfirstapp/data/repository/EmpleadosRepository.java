@@ -39,6 +39,23 @@ public class EmpleadosRepository {
         new GENERAL_ASYC(empleadosDao, 2).execute(empleados);
     }
 
+    public EMPLEADOS getUnSend() {
+        empleados = null;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                empleados = empleadosDao.getUnSend();
+            }
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return empleados;
+    }
+
     public void insertAll(final List<EMPLEADOS> empleadosList) {
         new Thread(new Runnable() {
             @Override
@@ -80,6 +97,24 @@ public class EmpleadosRepository {
             e.printStackTrace();
         }
         return empleados;
+    }
+
+    public void updateStatus(final int EMP_ID){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                empleadosDao.updateStatus(EMP_ID);
+            }
+        }).start();
+    }
+
+    public void changeStatus(final int EMP_ID){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                empleadosDao.changeStatus(EMP_ID);
+            }
+        }).start();
     }
 
     private static class GENERAL_ASYC extends AsyncTask<EMPLEADOS, Void, Void> {

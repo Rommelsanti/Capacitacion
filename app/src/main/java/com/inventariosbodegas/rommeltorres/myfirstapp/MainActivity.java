@@ -1,5 +1,6 @@
 package com.inventariosbodegas.rommeltorres.myfirstapp;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -7,22 +8,32 @@ import com.google.android.material.snackbar.Snackbar;
 
 import android.view.View;
 
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.inventariosbodegas.rommeltorres.myfirstapp.data.model.EMPLEADOS;
+import com.inventariosbodegas.rommeltorres.myfirstapp.data.viewmodel.MainViewModel;
+import com.inventariosbodegas.rommeltorres.myfirstapp.webApi.WebApiAdapter;
+import com.inventariosbodegas.rommeltorres.myfirstapp.webApi.webApiServices;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import android.view.Menu;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
+    private MainViewModel mainViewModel;
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
@@ -51,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        new sendData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -65,5 +79,33 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private class sendData extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            while (1 == 1) {
+
+                EMPLEADOS empleados = mainViewModel.getUnSendEmpleados();
+                if (empleados != null) {
+                    Call<Integer> empleadosCall = WebApiAdapter.getWebApiService(webApiServices.class).postEmpleados(empleados);
+                    try {
+                        Response<Integer> integerResponse = empleadosCall.execute();
+                        if (integerResponse.isSuccessful()) {
+                            mainViewModel.updateStatus(integerResponse.body());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
